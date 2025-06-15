@@ -1,0 +1,102 @@
+﻿@model TelaAutenticacao.Models.UserRegisterViewModel
+
+@{
+    ViewData["Title"] = "Cadastro de Usuário";
+    var users = ViewBag.Users as List<TelaAutenticacao.Models.User>;
+    int? editId = ViewBag.EditId as int?;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">
+                        @(editId.HasValue ? "Editar Usuário" : "Cadastro de Usuário")
+                    </h3>
+                    @if (ViewBag.SuccessMessage != null)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            @ViewBag.SuccessMessage
+                        </div>
+                    }
+                    <form asp-action="Register" method="post">
+                        @if (editId.HasValue)
+                        {
+                            <input type="hidden" name="editId" value="@editId" />
+                        }
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" type="password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            @(editId.HasValue ? "Salvar Alterações" : "Cadastrar")
+                        </button>
+                        @if (editId.HasValue)
+                        {
+                            <a href="@Url.Action("Register", "Account")" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Usuários Cadastrados</h4>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th style="width: 120px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (users != null && users.Any())
+                            {
+                                foreach (var user in users)
+                                {
+                                    <tr>
+                                        <td>@user.Name</td>
+                                        <td>@user.Email</td>
+                                        <td>
+                                            <a href="@Url.Action("Register", "Account", new { editId = user.Id })" class="btn btn-sm btn-primary">Editar</a>
+                                            <form asp-action="Delete" method="post" style="display:inline;">
+                                                <input type="hidden" name="id" value="@user.Id" />
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Deseja realmente excluir este usuário?');">Excluir</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center">Nenhum usuário cadastrado.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
